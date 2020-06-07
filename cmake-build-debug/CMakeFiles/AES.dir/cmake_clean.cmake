@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "AES"
   "AES.pdb"
-  "CMakeFiles/AES.dir/main.c.o"
+  "CMakeFiles/AES.dir/change.c.o"
 )
 
 # Per-language clean rules from dependency scanning.

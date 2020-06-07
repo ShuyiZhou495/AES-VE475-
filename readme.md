@@ -9,3 +9,6 @@
 // Mix columns layer, change the input matrix.
  void mixColumn(struct matrix *mat);
  ```
+
+void change_key_matrix(struct matrix *key)
+void trans_key(unsigned int* K, int round)

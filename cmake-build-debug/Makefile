@@ -123,32 +123,32 @@ AES/fast:
 	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/build
 .PHONY : AES/fast
 
-main.o: main.c.o
+change.o: change.c.o
 
-.PHONY : main.o
+.PHONY : change.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/main.c.o
-.PHONY : main.c.o
+change.c.o:
+	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/change.c.o
+.PHONY : change.c.o
 
-main.i: main.c.i
+change.i: change.c.i
 
-.PHONY : main.i
+.PHONY : change.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/main.c.i
-.PHONY : main.c.i
+change.c.i:
+	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/change.c.i
+.PHONY : change.c.i
 
-main.s: main.c.s
+change.s: change.c.s
 
-.PHONY : main.s
+.PHONY : change.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/main.c.s
-.PHONY : main.c.s
+change.c.s:
+	$(MAKE) -f CMakeFiles/AES.dir/build.make CMakeFiles/AES.dir/change.c.s
+.PHONY : change.c.s
 
 # Help Target
 help:
@@ -159,9 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... AES"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... change.o"
+	@echo "... change.i"
+	@echo "... change.s"
 .PHONY : help
 
 
