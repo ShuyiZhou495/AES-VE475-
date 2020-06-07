@@ -35,6 +35,9 @@ int toMix[4][4] = {
 // P(x) used in AES
 int Px[8] = {1, 1, 0, 1, 1, 0, 0, 0};
 
+// Used in transform key.
+int r[8] = {0, 0, 0, 0, 0, 0, 1, 0};
+
 // Global matrix, which is used to generate SBOX.
 struct matrix toMul;
 
@@ -48,7 +51,7 @@ void multiply(struct matrix *result, const struct matrix *left, const struct mat
 void shiftRows(struct matrix *mat);
 
 // Add toAdd array to the input array. The input array will be changed.
-void addForSBox(int *array);
+void addForSBox(int *array, struct matrix *pMatrix, int i);
 
 // Input the array (length 8, binary, represents the bits), change the array to Sbox generated array.
 void generateSBox(int *array);
@@ -85,33 +88,61 @@ void mixColumn(struct matrix *mat);
 // xor the result with the binary array of add. And return the decimal of xor result.
 int con_multiply_num(int a, int b, int add);
 
+void change_key_matrix(struct matrix *key);
+
+int xor_num(int a, int b);
+
+int xor_num_array(int a, int* b);
+
+void trans_key(int* K, int round);
+
+void addRoundKey(struct matrix *mat, const struct matrix * key, int round);
 
 int main()
 {
-
+    int i,j, round;
     toMul.row = 8;
     toMul.col = 8;
     toMul.array = (int*)SboxMul;
 
 // here are the plain text that has a bytes.
-int a[4][4]={
-        {219, 1, 2, 3} ,
-        {19, 1, 6, 7} ,
-        {83, 1, 10, 11},
-        {69, 1, 14, 15}
-};
-struct matrix plain = {.array=(int*)a, .row = 4, .col = 4};
+    int a[4][4]={
+            {219, 1, 2, 3} ,
+            {19, 1, 6, 7} ,
+            {83, 1, 10, 11},
+            {69, 1, 14, 15}
+    };
+    struct matrix plain = {.array=(int*)a, .row = 4, .col = 4};
 
-shiftRows(&plain);
-SubBytes(&plain);
-mixColumn(&plain);
-
-
-int i,j;
-for(i=0; i<4; i++) {
-    for(j=0;j<4;j++) {
-        printf("%d ", *(plain.array + 4*i +j));
+// here are the keys(128bits).
+    int k[4][4] = {
+            {219, 1, 2, 3} ,
+            {19, 1, 6, 7} ,
+            {83, 1, 10, 11},
+            {69, 1, 14, 15}
+    };
+    struct matrix key = {.array=(int*)malloc(4*44), .row=4, .col=44};
+    for(i=0; i<4; i++){
+        for(j=0;j<4;j++){
+            *(key.array + i*4 +j) = k[i][j];
+        }
     }
+    change_key_matrix(&key);
+
+    addRoundKey(&plain, &key, 0);
+    for(round =1; round<10; round++) {
+        SubBytes(&plain);
+        shiftRows(&plain);
+        mixColumn(&plain);
+        addRoundKey(&plain, &key, round);
+    }
+    SubBytes(&plain);
+    shiftRows(&plain);
+    addRoundKey(&plain, &key, 10);
+    for(i=0; i<4; i++) {
+        for(j=0;j<4;j++) {
+            printf("%d ", *(plain.array + 4*i +j));
+        }
     printf("\n");
 }
 
@@ -163,7 +194,7 @@ void shiftRows(struct matrix *mat)
     }
 }
 
-void addForSBox(int *array)
+void addForSBox(int *array, struct matrix *pMatrix, int i)
 {
     xor(array, toAdd);
 }
@@ -173,7 +204,7 @@ void generateSBox(int *array)
     struct matrix b = {.col = 1, .row = 8, .array = array};
     struct matrix c = {.col = 1, .row = 8, .array = (int*) malloc(8)};
     multiply(&c, &toMul, &b);
-    addForSBox(c.array);
+    addForSBox(c.array, NULL, 0);
     int i;
     for(i=0;i<8;i++) *(array+i) = *(c.array + i);
     free(c.array);
@@ -197,7 +228,8 @@ int toDecimal(const int *array)
     return result;
 }
 
-void con_multiply(int* result, const int* left, const int* right){
+void con_multiply(int* result, const int* left, const int* right)
+{
     int i, j;
     for(i=7;i>=0; i--){
         if(*(right+i)) {
@@ -221,7 +253,8 @@ void multiplyNTimes(int *result, int* matrix, int n)
     xor(result, matrix);
 }
 
-bool testInverse(const int*array){
+bool testInverse(const int*array)
+{
     if(*(array)==0) return false;
     int i;
     for(i=1;i<8;i++){
@@ -230,7 +263,8 @@ bool testInverse(const int*array){
     return true;
 }
 
-void findInverse(const int* array, int*test){
+void findInverse(const int* array, int*test)
+{
     int i;
     for(i=0;i<256;i++){
         toBinary(i, test);
@@ -240,7 +274,8 @@ void findInverse(const int* array, int*test){
     }
 }
 
-int SubSingleByte(int n){
+int SubSingleByte(int n)
+{
     int temp[8], inverse[8]={0, 0, 0, 0, 0, 0, 0, 0};
     if(n){
         toBinary(n, (int*)temp);
@@ -272,7 +307,8 @@ void mixColumn(struct matrix *mat)
     }
 }
 
-int con_multiply_num(int a, int b, int add){
+int con_multiply_num(int a, int b, int add)
+{
     int temp_a[8], temp_b[8], temp_result[8] = {0, 0, 0, 0, 0, 0, 0, 0}, temp_add[8];
     toBinary(a, temp_a);
     toBinary(b, temp_b);
@@ -280,4 +316,60 @@ int con_multiply_num(int a, int b, int add){
     toBinary(add, temp_add);
     xor(temp_result, temp_add);
     return toDecimal(temp_result);
+}
+
+void change_key_matrix(struct matrix *key)
+{
+    int i, j, temp[4], round;
+    for(round=1; round<=10; round++){
+        // deal with the 0-th column
+        for(i=0;i<4;i++) temp[i] = *(key->array + 4*i + 4*round - 1);
+        trans_key(temp, round);
+        for(i=0;i<4;i++) *(key->array + 4*i + 4*round) = xor_num(*(key->array + 4 * round - 4 + 4 * i), temp[i]);
+        // deal with 1-st, 1-nd, 3-rd column
+        for(j=1; j<4; j++){
+            for(i=0;i<4;i++) *(key->array+4*i+4*round+j) =
+                    xor_num(*(key->array+4*i+4*round+j-4), *(key->array+4*i+4*round+j-1));
+        }
+    }
+}
+
+int xor_num(int a, int b)
+{
+    int temp_a[8], temp_b[8];
+    toBinary(a, temp_a);
+    toBinary(b, temp_b);
+    xor(temp_a, temp_b);
+    return toDecimal(temp_a);
+}
+
+int xor_num_array(int a, int* b)
+{
+    int temp_a[8];
+    toBinary(a, temp_a);
+    xor(temp_a, b);
+    return toDecimal(temp_a);
+}
+
+void trans_key(int* K, int round)
+{
+    int result[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    multiplyNTimes(result, r, round - 1);
+    int temp = *(K), i;
+    // Cycally shift
+    for(i=0;i<3;i++) *(K+i) = *(K+i+1);
+    *(K+3) = temp;
+    // subbytes
+    for(i=0;i<4;i++) *(K) = SubSingleByte(*(K));
+    // xor a and r
+    *(K) = xor_num_array(*(K), result);
+}
+
+void addRoundKey(struct matrix *mat, const struct matrix * key, int round)
+{
+    int i, j;
+    for(i=0;i<4;i++){
+        for(j=0;j<4;j++)
+            *(mat->array+4*i + j) = xor_num(*(mat->array+4*i + j), *(key->array + 4*i + 4*round +j));
+    }
 }
