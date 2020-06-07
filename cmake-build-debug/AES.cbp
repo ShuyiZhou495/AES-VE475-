@@ -78,7 +78,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/change.c">
+		<Unit filename="/Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/main.c">
 			<Option target="AES"/>
 		</Unit>
 		<Unit filename="/Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/CMakeLists.txt">

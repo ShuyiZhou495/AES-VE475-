@@ -3,4 +3,4 @@ project(AES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(AES change.c)
+add_executable(AES main.c)

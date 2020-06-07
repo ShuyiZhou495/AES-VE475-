@@ -57,27 +57,27 @@ include CMakeFiles/AES.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/AES.dir/flags.make
 
-CMakeFiles/AES.dir/change.c.o: CMakeFiles/AES.dir/flags.make
-CMakeFiles/AES.dir/change.c.o: ../change.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/AES.dir/change.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/AES.dir/change.c.o   -c /Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/change.c
+CMakeFiles/AES.dir/main.c.o: CMakeFiles/AES.dir/flags.make
+CMakeFiles/AES.dir/main.c.o: ../main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/AES.dir/main.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/AES.dir/main.c.o   -c /Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/main.c
 
-CMakeFiles/AES.dir/change.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/AES.dir/change.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/change.c > CMakeFiles/AES.dir/change.c.i
+CMakeFiles/AES.dir/main.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/AES.dir/main.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/main.c > CMakeFiles/AES.dir/main.c.i
 
-CMakeFiles/AES.dir/change.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/AES.dir/change.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/change.c -o CMakeFiles/AES.dir/change.c.s
+CMakeFiles/AES.dir/main.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/AES.dir/main.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/main.c -o CMakeFiles/AES.dir/main.c.s
 
 # Object files for target AES
 AES_OBJECTS = \
-"CMakeFiles/AES.dir/change.c.o"
+"CMakeFiles/AES.dir/main.c.o"
 
 # External object files for target AES
 AES_EXTERNAL_OBJECTS =
 
-AES: CMakeFiles/AES.dir/change.c.o
+AES: CMakeFiles/AES.dir/main.c.o
 AES: CMakeFiles/AES.dir/build.make
 AES: CMakeFiles/AES.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/zhoushuyi/Documents/VE475/assignments/hw3/AES/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable AES"

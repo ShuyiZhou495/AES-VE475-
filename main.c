@@ -4,25 +4,16 @@
 #include <stdbool.h>
 
 struct matrix{
-    unsigned int row;
-    unsigned int col;
+    int row;
+    int col;
     unsigned int* array;
 };
 
 // Matrix added for Sbox.
-  unsigned int toAdd[8] = {1, 1, 0, 0, 0, 1, 1, 0};
+unsigned int toAdd = 99;
 
 // Mtrix multiplied for Sbox
-  unsigned int SboxMul[8][8] = {
-        {1, 0, 0, 0, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 1, 1, 1},
-        {1, 1, 1, 0, 0, 0, 1, 1},
-        {1, 1, 1, 1, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 0, 0, 0},
-        {0, 1, 1, 1, 1, 1, 0, 0},
-        {0, 0, 1, 1, 1, 1, 1, 0},
-        {0, 0, 0, 1, 1, 1, 1, 1}
-};
+unsigned int SboxMul[8] = {241, 227, 199, 143, 31, 62, 124, 248};
 
 // C(x) in the Mix Column Layer
 unsigned int toMix[4][4] = {
@@ -33,90 +24,58 @@ unsigned int toMix[4][4] = {
 };
 
 // P(x) used in AES
-unsigned int Px[8] = {1, 1, 0, 1, 1, 0, 0, 0};
+unsigned int Px = 27;
 
 // Used in transform key.
-unsigned int r[8] = {0, 0, 0, 0, 0, 0, 1, 0};
+unsigned int r = 2;
 
-// Global matrix, which is used to generate SBOX.
-struct matrix toMul;
-
-// Do the xor operation, array1 will be changed to the result, the second array will not be changed..
-void xor(  unsigned int* array1, const   unsigned int* array2);
-
-// Do the normal multiplication of two matrixs, the result of (left)(right) will be written in (result).
-void multiply(struct matrix *result, const struct matrix *left, const struct matrix *right);
-
-// ShiftRow layer, the matrix will be changed.
-void shiftRows(struct matrix *mat);
-
-// Add toAdd array to the input array. The input array will be changed.
-void addForSBox(    unsigned int *array, struct matrix *pMatrix, unsigned int i);
-
-// Input the array (length 8, binary, represents the bits), change the array to Sbox generated array.
-void generateSBox(    unsigned int *array);
-
-// Write the binary array of unsigned int a in array.
-void toBinary(int a,   unsigned int* array);
-
-// Input the binary array, return decimal number.
-int toDecimal(const     unsigned int *array);
-
-// In the multiplication of AES binary columns, this is shift the array to left for one bits for n times.
-// If the most significant bit is 1, it will do xor with P(x).
-void multiplyNTimes(    unsigned int *result,   unsigned int* matrix, unsigned int n);
-
-// Multiplication of AES binary columns. like 00000100*10000000. Result is return in result array.
-void con_multiply(  unsigned int* result, const   unsigned int* left, const   unsigned int* right);
-
-// Used in findInverse function. Check whether the flag(input) array is 00000001.
-bool testInverse(const   unsigned int*array);
-
-// Given a binary array, write the inverse of the array in test.
-void findInverse(const   unsigned int* array,   unsigned int* test);
+// Given a decimal, return the inverse of it.
+unsigned int findInverse(unsigned int a);
 
 // Given a single byte, with decimal representation n, return decimal of the subbyte version.
-int SubSingleByte(  unsigned int n);
+unsigned int SubSingleByte(  unsigned int n);
 
 // Subbytes layer. Change the input matrix.
 void SubBytes(struct matrix *mat);
 
-// Mix columns layer, change the input matrix.
+// ShiftRow layer, the matrix will be changed.
+void shiftRows(struct matrix *mat);
+
+// The multiply method in AES, return decimal.
+unsigned int con_multiply(unsigned int left, unsigned int right);
+
+// Input a decimal number, times this number by the matrix and xor by the matrix to generate Sbox number.
+unsigned int generateSBox(unsigned int a);
+
+// Mix column layer
 void mixColumn(struct matrix *mat);
 
-// Used in mix column function. Turn a and b to binary arrays and do the AES multiplication. And then
-// xor the result with the binary array of add. And return the decimal of xor result.
-int con_multiply_num(int a, unsigned int b, unsigned int add);
-
+// Generate all the keys
 void change_key_matrix(struct matrix *key);
 
-int xor_num(int a, unsigned int b);
-
-int xor_num_array(int a, unsigned int* b);
-
+// Transform the columns that mod 4 equals 0.
 void trans_key(unsigned int* K, int round);
 
+// Add round key layer.
 void addRoundKey(struct matrix *mat, const struct matrix * key, unsigned int round);
 
 int main(int argc, char *argv[])
 {
     int i,j, round;
-    toMul.row = 8;
-    toMul.col = 8;
-    toMul.array = (unsigned int*)SboxMul;
 // here are the plain text that has a bytes.
-    unsigned int a[4][4];
-    for(j=0;j<4;j++){
-        for(i=0;i<4;i++) a[i][j]=(int)argv[1][i+j*4];
+    unsigned int a[4][4] = {{219, 1, 83, 69}, {19, 1, 1, 1}, {83, 1, 10, 11}, {69, 1, 14, 15}};
+    if(argc==3) {
+        for (j = 0; j < 4; j++) {
+            for (i = 0; i < 4; i++) a[i][j] = argv[1][i + j * 4];
+        }
     }
-    struct matrix plain = {.array=(  unsigned int*)a, .row = 4, .col = 4};
+    struct matrix plain = {.array=(unsigned int*)a, .row = 4, .col = 4};
 
 // here are the keys(128bits).
     unsigned int k[4][4];
     for(j=0;j<4;j++){
-        for(i=0;i<4;i++) k[i][j]=(  unsigned int)argv[2][i+j*4];
+        for(i=0;i<4;i++) k[i][j]=(unsigned char)argv[2][i+j*4];
     }
-
     struct matrix key = {.array=(unsigned int*)malloc(4*44), .row=4, .col=44};
     for(i=0; i<4; i++){
         for(j=0;j<4;j++){
@@ -125,6 +84,7 @@ int main(int argc, char *argv[])
     }
     change_key_matrix(&key);
 
+// start encrypt
     addRoundKey(&plain, &key, 0);
     for(round =1; round<10; round++) {
         SubBytes(&plain);
@@ -135,6 +95,13 @@ int main(int argc, char *argv[])
     SubBytes(&plain);
     shiftRows(&plain);
     addRoundKey(&plain, &key, 10);
+    for(i=0; i<4; i++) {
+        for(j=0;j<4;j++) {
+            printf("%d ", *(plain.array + 4*i +j));
+        }
+        printf("\n");
+    }
+    printf("\n");
     for(j=0; j<4; j++) {
         for(i=0;i<4;i++) {
             printf("%c", *(plain.array + 4*i +j));
@@ -144,32 +111,82 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void xor(  unsigned int* array1, const   unsigned int* array2){
+unsigned int con_multiply(unsigned int left, unsigned int right)
+{
+    unsigned int result=0, temp=0;
+    int i, j, n;
+    for(i=128,j=7;i>=1;i/=2,j--){
+        if(right/i){
+            temp=left;
+            for(n=0;n<j;n++){
+                if(temp>=128){
+                    temp=2*temp - 256;
+                    temp = temp^Px;
+                }
+                else temp*=2;
+            }
+            result = result ^ temp;
+            right -= i;
+        }
+    }
+    return result;
+}
+
+unsigned int findInverse(unsigned int a)
+{
     unsigned int i;
-    for(i=0; i<8; i++) *(array1+i) = (*(array1+i) + *(array2+i)) % 2;
+    for(i=0;i<256;i++){
+        if(con_multiply(a,i)==1) return i;
+    }
+    return 0;
+}
+
+bool ifOddOnes(unsigned int a)
+{
+    bool flag = false;
+    int i;
+    for(i=128;a>0;i/=2){
+        if(a/i){
+            flag = !flag;
+            a -= i;
+        }
+    }
+    return flag;
+}
+
+unsigned int generateSBox(unsigned int a)
+{
+    int i, j;
+    unsigned int result=0, temp;
+    for (i=0,j=1; i<8; i++, j*=2){
+        temp = SboxMul[i] & a;
+        result += ifOddOnes(temp) * j;
+    }
+    return result^toAdd;
 }
 
 
-void multiply(struct matrix *result, const struct matrix *left, const struct matrix *right)
+unsigned int SubSingleByte(unsigned int n)
 {
-    assert(left->col==right->row);
-    unsigned int i,j,k;
-    for(i=0;i<result->row;i++){
-        for(j=0;j<result->col;j++){
-            *(result->array + i * result->col  + j )= 0;
-            for(k=0;k<left->col;k++){
-                *(result->array + i * result->col  + j ) +=
-                        *(left->array + i * left->col  + k ) * *(right->array + k * right->col  + j );
-            }
-        }
+    unsigned int inverse=0;
+    if(n) inverse = findInverse(n);
+    return generateSBox(inverse);
+}
+
+void SubBytes(struct matrix *mat)
+{
+    unsigned int i, j;
+    for(i = 0; i<mat->row;i++){
+        for (j=0;j<mat->col;j++)
+            *(mat->array+i*mat->col + j) = SubSingleByte(*(mat->array+i*mat->col + j));
     }
 }
 
 void shiftRows(struct matrix *mat)
 {
-    unsigned int i;
+    int i;
     for(i = 1; i <= 3; i++){
-          unsigned int temp[4]  = {
+        unsigned int temp[4]  = {
                 *(mat->array + i*mat->col),
                 *(mat->array + i*mat->col + 1),
                 *(mat->array + i*mat->col + 2),
@@ -182,105 +199,6 @@ void shiftRows(struct matrix *mat)
     }
 }
 
-void addForSBox(  unsigned int *array, struct matrix *pMatrix, unsigned int i)
-{
-    xor(array, toAdd);
-}
-
-void generateSBox(  unsigned int *array)
-{
-    struct matrix b = {.col = 1, .row = 8, .array = array};
-    struct matrix c = {.col = 1, .row = 8, .array = (  unsigned int*) malloc(8)};
-    multiply(&c, &toMul, &b);
-    addForSBox(c.array, NULL, 0);
-    unsigned int i;
-    for(i=0;i<8;i++) *(array+i) = *(c.array + i);
-    free(c.array);
-}
-
-void toBinary(int a,   unsigned int* array)
-{
-    unsigned int i, j;
-    for (i=128, j=7; i>=1; i/=2, j--){
-        *(array + j) = a/i;
-        a -= (a/i)*i;
-    }
-}
-
-int toDecimal(const   unsigned int *array)
-{
-    unsigned int i,j, result=0;
-    for(i=0,j=1;i<8;i++,j*=2){
-        result += *(array+i) * j;
-    }
-    return result;
-}
-
-void con_multiply(  unsigned int* result, const   unsigned int* left, const   unsigned int* right)
-{
-    unsigned int i, j;
-    for(i=7;i>=0; i--){
-        if(*(right+i)) {
-            unsigned int temp[8];
-            for(j=0;j<8;j++) temp[j] = *(left+j);
-            multiplyNTimes(result, (  unsigned int*)temp, i);
-        }
-    }
-}
-
-
-void multiplyNTimes(unsigned int *result,   unsigned int* matrix, unsigned int n)
-{
-    unsigned int i, flag,j;
-    for(i=0;i<n;i++){
-        flag = *(matrix + 7);
-        for(j=7;j>0;j--) *(matrix+j) = *(matrix+j-1);
-        *(matrix) = 0;
-        if(flag==1) xor(matrix, (  unsigned int*)Px);
-    }
-    xor(result, matrix);
-}
-
-bool testInverse(const   unsigned int*array)
-{
-    if(*(array)==0) return false;
-    unsigned int i;
-    for(i=1;i<8;i++){
-        if(*(array+i)==1) return false;
-    }
-    return true;
-}
-
-void findInverse(const   unsigned int* array,   unsigned int*test)
-{
-    unsigned int i;
-    for(i=0;i<256;i++){
-        toBinary(i, test);
-          unsigned int result[8]={0, 0, 0, 0, 0, 0, 0, 0};
-        con_multiply(result, array, test);
-        if(testInverse(result)) return;
-    }
-}
-
-int SubSingleByte(  unsigned int n)
-{
-    unsigned int temp[8], inverse[8]={0, 0, 0, 0, 0, 0, 0, 0};
-    if(n){
-        toBinary(n, (  unsigned int*)temp);
-        findInverse((  unsigned int*)temp, (  unsigned int*)inverse);
-    }
-    generateSBox((  unsigned int*) inverse);
-    return toDecimal((  unsigned int*) inverse);
-}
-
-void SubBytes(struct matrix *mat)
-{
-    unsigned int i, j;
-    for(i = 0; i<mat->row;i++){
-        for (j=0;j<mat->col;j++) *(mat->array+i*mat->col + j) = SubSingleByte(*(mat->array+i*mat->col + j));
-    }
-}
-
 void mixColumn(struct matrix *mat)
 {
     unsigned int temp[4], i, j, k;
@@ -288,22 +206,35 @@ void mixColumn(struct matrix *mat)
         for(j=0; j<4; j++){
             temp[j] = 0;
             for(k=0;k<4;k++){
-                temp[j]=con_multiply_num(toMix[j][k], *(mat->array + k*4 + i), temp[j]);
+                temp[j]=con_multiply(toMix[j][k], *(mat->array + k*4 + i)) ^ temp[j];
             }
         }
         for(j=0;j<4;j++) *(mat->array + j*4 + i) = temp[j];
     }
 }
 
-int con_multiply_num(int a, unsigned int b, unsigned int add)
+void trans_key(unsigned int* K, int round)
 {
-      unsigned int temp_a[8], temp_b[8], temp_result[8] = {0, 0, 0, 0, 0, 0, 0, 0}, temp_add[8];
-    toBinary(a, temp_a);
-    toBinary(b, temp_b);
-    con_multiply(temp_result, temp_a, temp_b);
-    toBinary(add, temp_add);
-    xor(temp_result, temp_add);
-    return toDecimal(temp_result);
+    int i;
+    unsigned int rx=1;
+    for(i=1; i<round;i++) rx = con_multiply(rx, r);
+    unsigned int temp = *(K);
+    // Cycally shift
+    for(i=0;i<3;i++) *(K+i) = *(K+i+1);
+    *(K+3) = temp;
+    // subbytes
+    for(i=0;i<4;i++) *(K) = SubSingleByte(*(K));
+    // xor a and r
+    *(K) = *(K)^rx;
+}
+
+void addRoundKey(struct matrix *mat, const struct matrix * key, unsigned int round)
+{
+    unsigned int i, j;
+    for(i=0;i<4;i++){
+        for(j=0;j<4;j++)
+            *(mat->array+4*i + j) = *(mat->array+4*i + j) ^ *(key->array + 4*i + 4*round +j);
+    }
 }
 
 void change_key_matrix(struct matrix *key)
@@ -320,45 +251,5 @@ void change_key_matrix(struct matrix *key)
             for(i=0;i<4;i++) *(key->array+4*i+4*round+j) =
                                      *(key->array+4*i+4*round+j-4) ^ *(key->array+4*i+4*round+j-1);
         }
-    }
-}
-
-int xor_num(int a, unsigned int b)
-{
-    unsigned int temp_a[8], temp_b[8];
-    toBinary(a, temp_a);
-    toBinary(b, temp_b);
-    xor(temp_a, temp_b);
-    return toDecimal(temp_a);
-}
-
-int xor_num_array(int a,   unsigned int* b)
-{
-    unsigned int temp_a[8];
-    toBinary(a, temp_a);
-    xor(temp_a, b);
-    return toDecimal(temp_a);
-}
-
-void trans_key(unsigned int* K, int round)
-{
-    unsigned int result[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    multiplyNTimes(result, r, round - 1);
-    unsigned int temp = *(K), i;
-    // Cycally shift
-    for(i=0;i<3;i++) *(K+i) = *(K+i+1);
-    *(K+3) = temp;
-    // subbytes
-    for(i=0;i<4;i++) *(K) = SubSingleByte(*(K));
-    // xor a and r
-    *(K) = xor_num_array(*(K), result);
-}
-
-void addRoundKey(struct matrix *mat, const struct matrix * key, unsigned int round)
-{
-    unsigned int i, j;
-    for(i=0;i<4;i++){
-        for(j=0;j<4;j++)
-            *(mat->array+4*i + j) = xor_num(*(mat->array+4*i + j), *(key->array + 4*i + 4*round +j));
     }
 }
