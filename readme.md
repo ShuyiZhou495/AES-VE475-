@@ -12,7 +12,7 @@ I used a structure to save plaintext and key. It is interpreted as matrix.
 struct matrix{
     int row;
     int col;
-    unsigned int* array;
+    unsigned char* array;
 };
 ``` 
 In all the layers, the address of the matrix is passed into the function, and matrix itself is changed.
@@ -28,13 +28,13 @@ void shiftRows(struct matrix *mat);
 void mixColumn(struct matrix *mat);
 
 // Add round key layer.
-void addRoundKey(struct matrix *mat, const struct matrix * key, unsigned int round);
+void addRoundKey(struct matrix *mat, const struct matrix * key, unsigned char round);
  ```
 
 ### Generate Sbox function
 ```c
 // Given a single byte, with decimal representation n, return decimal of the subbyte version.
-   unsigned int SubSingleByte(unsigned int n);
+   unsigned char SubSingleByte(unsigned char n);
 ```
 
 ### The first three layers
